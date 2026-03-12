@@ -1,0 +1,55 @@
+<idea-plugin>
+    <id>com.jsenin.pytestfixturenavigator.fixture-navigator</id>
+    <name>Pytest Fixture Navigator</name>
+    <version>0.1.0</version>
+    <vendor>YourName</vendor>
+
+    <description><![CDATA[
+        <p>Instantly search and jump to any <code>@pytest.fixture</code> definition across your entire project.</p>
+
+        <h3>Features</h3>
+        <ul>
+            <li>Searchable popup listing all fixtures found in <code>test_*.py</code> and <code>conftest.py</code> files</li>
+            <li>Filter simultaneously by fixture name and file path</li>
+            <li>Browse button to narrow results to a specific folder</li>
+            <li>Inline code preview with syntax highlighting, centered on the fixture definition</li>
+            <li>Multiple selection — open several fixtures at once</li>
+            <li>Sort by fixture name or by file path</li>
+            <li>Right-click any folder in the Project tree → <b>Open Fixture Navigator Here</b></li>
+            <li>Pre-fills the name filter from selected text in the editor</li>
+            <li>Automatic index refresh — updates in the background whenever a test file changes</li>
+        </ul>
+
+        <h3>Usage</h3>
+        <p>Press <b>Cmd+Shift+F</b> (macOS) or <b>Ctrl+Shift+F</b> (Linux/Windows), or go to
+        <b>Navigate → Open Fixture Navigator</b>. Use arrow keys to browse, Enter or F4 to jump
+        to the definition, double-click to open. Shortcut can be changed in
+        <b>Settings → Keymap → Pytest Fixture Navigator</b>.</p>
+    ]]></description>
+
+    <idea-version since-build="251" until-build="251.*"/>
+
+    <depends>com.intellij.modules.python</depends>
+
+    <actions>
+        <action
+            id="FixtureNavigator.Open"
+            class="com.jsenin.pytestfixturenavigator.FunctionNavigatorAction"
+            text="Open Pytest Fixture Navigator"
+            description="Show a searchable list of all @pytest.fixture functions in test_*.py and conftest.py files">
+
+            <add-to-group group-id="GoToMenu" anchor="last"/>
+
+            <keyboard-shortcut
+                keymap="$default"
+                first-keystroke="meta shift F"/>
+        </action>
+        <action
+            id="FixtureNavigator.OpenFromTree"
+            class="com.jsenin.pytestfixturenavigator.FixtureNavigatorTreeAction"
+            text="Open Fixture Navigator Here"
+            description="Show fixtures under the selected folder">
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+        </action>
+    </actions>
+</idea-plugin>
