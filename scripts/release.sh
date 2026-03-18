@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euo pipefail
+#set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
@@ -10,7 +10,11 @@ if [[ -z "$VERSION" ]]; then
 fi
 
 echo "Bumping version to $VERSION..."
-sed -i '' "s/^version\s*=\s*\".*\"/version = \"$VERSION\"/" build.gradle.kts
+if [[ "$(uname)" == "Darwin" ]]; then
+  sed -i '' "s/^version\s*=\s*\".*\"/version = \"$VERSION\"/" build.gradle.kts
+else
+  sed -i "s/^version\s*=\s*\".*\"/version = \"$VERSION\"/" build.gradle.kts
+fi
 
 echo "Building plugin..."
 ./gradlew clean buildPlugin

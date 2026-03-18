@@ -27,7 +27,7 @@
         <b>Settings → Keymap → Pytest Fixture Navigator</b>.</p>
     ]]></description>
 
-    <idea-version since-build="251" until-build="251.*"/>
+    <idea-version since-build="251"/>
 
     <depends>com.intellij.modules.python</depends>
 

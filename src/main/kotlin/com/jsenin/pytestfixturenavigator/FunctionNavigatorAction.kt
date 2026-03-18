@@ -95,6 +95,7 @@ private fun PyFunction.isPytestFixture(): Boolean =
         text == "pytest.fixture" || text.startsWith("pytest.fixture(")
     } == true
 
+@Suppress("EXPERIMENTAL_API_USAGE")
 private fun collectFixtures(project: Project): List<FixtureEntry> {
     val result = mutableListOf<FixtureEntry>()
     val scope = GlobalSearchScope.projectScope(project)
