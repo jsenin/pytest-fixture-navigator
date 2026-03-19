@@ -20,12 +20,18 @@ dependencies {
         pluginVerifier()
         zipSigner()
     }
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
 }
 
 intellijPlatform {
     pluginConfiguration {
         ideaVersion {
             sinceBuild = "251"
+        }
+    }
+    pluginVerification {
+        ides {
+            recommended()
         }
     }
 }

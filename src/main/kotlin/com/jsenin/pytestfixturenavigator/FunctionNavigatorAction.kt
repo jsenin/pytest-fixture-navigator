@@ -5,7 +5,6 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.fileChooser.FileChooser
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.editor.Editor
@@ -46,6 +45,7 @@ import javax.swing.*
 import javax.swing.SwingUtilities
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
+import kotlinx.coroutines.runBlocking
 
 // ── Data ─────────────────────────────────────────────────────────────────────
 
@@ -76,7 +76,7 @@ private fun watchProject(project: Project) {
                 fixtureCache.remove(project)
                 object : Task.Backgroundable(project, "Updating fixture index…", false) {
                     override fun run(indicator: ProgressIndicator) {
-                        val fixtures = ReadAction.compute<List<FixtureEntry>, Exception> {
+                        val fixtures = runBlocking {
                             collectFixtures(project)
                         }
                         fixtureCache[project] = fixtures
@@ -96,7 +96,7 @@ private fun PyFunction.isPytestFixture(): Boolean =
     } == true
 
 @Suppress("EXPERIMENTAL_API_USAGE")
-private fun collectFixtures(project: Project): List<FixtureEntry> {
+private suspend fun collectFixtures(project: Project): List<FixtureEntry> = com.intellij.openapi.application.readAction {
     val result = mutableListOf<FixtureEntry>()
     val scope = GlobalSearchScope.projectScope(project)
     val psiManager = PsiManager.getInstance(project)
@@ -124,7 +124,7 @@ private fun collectFixtures(project: Project): List<FixtureEntry> {
             }
         }
 
-    return result.sortedBy { it.name.lowercase() }
+    result.sortedBy { it.name.lowercase() }
 }
 
 private fun openNavigator(project: Project, fixtures: List<FixtureEntry>, initialNameFilter: String? = null, initialPathFilter: String? = null) {
@@ -148,7 +148,7 @@ private fun openNavigatorCached(project: Project, initialNameFilter: String? = n
     }
     object : Task.Backgroundable(project, "Scanning fixtures…", false) {
         override fun run(indicator: ProgressIndicator) {
-            val fixtures = ReadAction.compute<List<FixtureEntry>, Exception> {
+            val fixtures = runBlocking {
                 collectFixtures(project)
             }
             fixtureCache[project] = fixtures
