@@ -363,7 +363,7 @@ class FixtureNavigatorDialog(
                 .findFileByPath(entry.absolutePath)
             val document = vFile?.let { FileDocumentManager.getInstance().getDocument(it) }
             if (document != null) {
-                val editor = EditorFactory.getInstance().createViewer(document, project)
+                val editor = EditorFactory.getInstance().createEditor(document, project)
                 editor.settings.apply {
                     isLineNumbersShown = true
                     isFoldingOutlineShown = false
