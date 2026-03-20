@@ -25,10 +25,10 @@ if [[ -z "$ZIP" ]]; then
   exit 1
 fi
 
-echo "Tagging v$VERSION..."
+echo "Tagging $VERSION..."
 git add build.gradle.kts
 git commit -m "chore: release v$VERSION"
-git tag "v$VERSION"
+git tag "$VERSION"
 
 echo ""
 echo "Done: $ZIP"
