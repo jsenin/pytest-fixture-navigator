@@ -22,6 +22,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.vfs.newvfs.BulkFileListener
 import com.intellij.openapi.vfs.newvfs.events.VFileEvent
+import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiManager
 import com.intellij.psi.search.FilenameIndex
 import com.intellij.psi.search.GlobalSearchScope
@@ -354,33 +355,50 @@ class FixtureNavigatorDialog(
     }
 
     private fun updatePreview(entry: FixtureEntry?) {
-        previewEditor?.let { EditorFactory.getInstance().releaseEditor(it) }
+        previewEditor?.let {
+            if (!it.isDisposed) {
+                EditorFactory.getInstance().releaseEditor(it)
+            }
+        }
         previewEditor = null
         previewPanel.removeAll()
 
-        if (entry != null) {
-            val vFile = com.intellij.openapi.vfs.LocalFileSystem.getInstance()
-                .findFileByPath(entry.absolutePath)
-            val document = vFile?.let { FileDocumentManager.getInstance().getDocument(it) }
-            if (document != null) {
-                val editor = EditorFactory.getInstance().createEditor(document, project)
-                editor.settings.apply {
-                    isLineNumbersShown = true
-                    isFoldingOutlineShown = false
-                }
-                previewEditor = editor
-                previewPanel.add(editor.component, BorderLayout.CENTER)
-                previewPanel.revalidate()
-                previewPanel.repaint()
-                SwingUtilities.invokeLater {
-                    editor.scrollingModel.scrollTo(LogicalPosition(entry.line, 0), ScrollType.CENTER)
-                }
-                return
-            }
+        if (entry == null || project.isDisposed) {
+            previewPanel.revalidate()
+            previewPanel.repaint()
+            return
         }
 
-        previewPanel.revalidate()
-        previewPanel.repaint()
+        val vFile = com.intellij.openapi.vfs.LocalFileSystem.getInstance()
+            .findFileByPath(entry.absolutePath)
+        if (vFile == null || !vFile.isValid) {
+            previewPanel.revalidate()
+            previewPanel.repaint()
+            return
+        }
+
+        val psiFile = PsiManager.getInstance(project).findFile(vFile) as? PyFile
+        val document = psiFile?.viewProvider?.document
+
+        if (document != null) {
+            val editor = EditorFactory.getInstance().createEditor(document, project)
+            editor.settings.apply {
+                isLineNumbersShown = true
+                isFoldingOutlineShown = false
+            }
+            previewEditor = editor
+            previewPanel.add(editor.component, BorderLayout.CENTER)
+            previewPanel.revalidate()
+            previewPanel.repaint()
+            SwingUtilities.invokeLater {
+                if (!editor.isDisposed) {
+                    editor.scrollingModel.scrollTo(LogicalPosition(entry.line, 0), ScrollType.CENTER)
+                }
+            }
+        } else {
+            previewPanel.revalidate()
+            previewPanel.repaint()
+        }
     }
 
     private fun populateList() {
